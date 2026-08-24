@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Programming\\C#\\Notes\\Back-End\\BlogAPI\\BlogAPI.csproj": {}
+    "D:\\Programming\\C#\\Notes\\BE\\BlogAPI\\BlogAPI.csproj": {}
   },
   "projects": {
-    "D:\\Programming\\C#\\Notes\\Back-End\\BlogAPI\\BlogAPI.csproj": {
+    "D:\\Programming\\C#\\Notes\\BE\\BlogAPI\\BlogAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Programming\\C#\\Notes\\Back-End\\BlogAPI\\BlogAPI.csproj",
+        "projectUniqueName": "D:\\Programming\\C#\\Notes\\BE\\BlogAPI\\BlogAPI.csproj",
         "projectName": "BlogAPI",
-        "projectPath": "D:\\Programming\\C#\\Notes\\Back-End\\BlogAPI\\BlogAPI.csproj",
+        "projectPath": "D:\\Programming\\C#\\Notes\\BE\\BlogAPI\\BlogAPI.csproj",
         "packagesPath": "C:\\Users\\Zestyy\\.nuget\\packages\\",
-        "outputPath": "D:\\Programming\\C#\\Notes\\Back-End\\BlogAPI\\obj\\",
+        "outputPath": "D:\\Programming\\C#\\Notes\\BE\\BlogAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
