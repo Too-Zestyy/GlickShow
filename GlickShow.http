@@ -1,0 +1,6 @@
+@GlickShow_HostAddress = http://localhost:5027
+
+GET {{GlickShow_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
