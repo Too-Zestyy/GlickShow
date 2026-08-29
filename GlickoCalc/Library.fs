@@ -1,12 +1,7 @@
 ﻿namespace GlickoCalc
+open System
 
-// module Say =
-//     let hello name =
-//         printfn "Hello %s" name
-
-module Glicko =
-    let step3g (rating: double) = 
-        printfn "%f" rating
-
-    let step4a (rating: double) = 
-        printfn "step 4a %f" rating
+module Steps =
+    let Three_g (deviation: float) = 
+        let deviationSquared = deviation ** 2 
+        1.0 / sqrt(1.0 + 3.0*deviationSquared / Math.PI**2)
