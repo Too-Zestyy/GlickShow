@@ -37,7 +37,7 @@ module Steps =
 
         let mutable varianceSum = 0.0
 
-        for i in 1..opponentRatings.Length do
+        for i in 1..opponentRatings.Length-1 do
             let matchE = Three_E(playerRating, opponentRatings[i], opponentDeviations[i])
             varianceSum <- varianceSum + Three_g(opponentDeviations[i]) ** 2 * matchE * (1.0 - matchE)
         varianceSum
@@ -57,10 +57,107 @@ module Steps =
 
         let mutable ratingSum = 0.0
 
-        for i in 1..opponentRatings.Length do
+        for i in 1..opponentRatings.Length-1 do
             ratingSum <- ratingSum + Three_g(opponentDeviations[i]) * (gameOutcomes[i] - Three_E(playerRating, opponentRatings[i], opponentDeviations[i]))
 
         ratingSum
+
+    let aFromVolatility (volatility: float) = 
+        log(volatility ** 2)
+
+    let fVolatilityFunction (x: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
+        let a = aFromVolatility(volatility)
+        let ePowX = exp(x)
+        let deviationSquared = deviation ** 2
+
+        ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / (2.0 * (deviationSquared + variance + ePowX ** 2) - (x-a) / systemConstant ** 2)
+
+    let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
+        let a = aFromVolatility(volatility)
+
+        let mutable A = a
+        let mutable B = 0.0
+
+        if delta ** 2 > deviation**2 + variance then
+            B <- log(delta ** 2 - deviation ** 2 - variance)
+        else 
+            let mutable k = 1.0
+
+            while fVolatilityFunction(a-k*systemConstant, systemConstant, volatility, delta, deviation, variance) < 1 do
+                k <- k + 1.0
+
+            B <- a - k*systemConstant
+
+        let mutable fA = fVolatilityFunction(A, systemConstant, volatility, delta, deviation, variance)
+        let mutable fB = fVolatilityFunction(B, systemConstant, volatility, delta, deviation, variance)
+
+        while abs(B-A) > convergenceTolerance do
+
+            let C = A + (A-B)*fA/(fB-fA)
+            let fC = fVolatilityFunction(C, systemConstant, volatility, delta, deviation, variance)
+
+            if fC*fB <= 0 then
+                A <- B
+                fA <- fB
+            else
+                fA <- fA / 2.0
+            
+            B <- C
+            fB <- fC
+
+        exp(A / 2.0)
+            
+    let volatilityFromMatches (
+        playerRating: float, playerDeviation: float, playerVolatility: float, periodVariance: float, 
+        opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[], 
+        convergenceTolerance: float, systemConstant: float) = 
+        let delta = estimateRatingImprovement(playerRating, opponentRatings, opponentDeviations, gameOutcomes, periodVariance)
+        calculateNewVolatility(convergenceTolerance, systemConstant, playerVolatility, delta, playerDeviation, periodVariance)
+
+    let preRatingDeviation (deviation: float, volatility: float) = 
+        sqrt(deviation ** 2 + volatility ** 2)
+
+    let playedPeriodDeviation (playerDeviation: float, variance: float, newVolatilty: float) = 
+        1.0 / sqrt(1.0/preRatingDeviation(playerDeviation, newVolatilty)**2 + 1.0/variance)
+    
+    let playedPeriodRating (playerRating: float, postPeriodDeviation: float, opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[]) = 
+        if opponentRatings.Length <> opponentDeviations.Length || opponentRatings.Length <> gameOutcomes.Length || opponentDeviations.Length <> gameOutcomes.Length then
+            failwithf "`opponentRatings`, `opponentDeviations` and `gameOutcomes` must be of the same length (got lengths %d, %d and %d)" opponentRatings.Length opponentDeviations.Length gameOutcomes.Length
+
+        let mutable deviationSum = 0.0
+
+        for i in 0..opponentRatings.Length-1 do
+            deviationSum <- deviationSum + Three_g(opponentDeviations[i]) * (gameOutcomes[i] - Three_E(playerRating, opponentRatings[i], opponentDeviations[i]))
+
+        playerRating + postPeriodDeviation ** 2 * deviationSum
+
+    let UpdatePlayerFromMatches (
+        playerRating: float, playerDeviation: float, playerVolatility: float, 
+        opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[],
+        systemConstant: float, convergenceTolerance: float) = 
+        if opponentRatings.Length <> opponentDeviations.Length || opponentRatings.Length <> gameOutcomes.Length || opponentDeviations.Length <> gameOutcomes.Length then
+            failwithf "`opponentRatings`, `opponentDeviations` and `gameOutcomes` must be of the same length (got lengths %d, %d and %d)" opponentRatings.Length opponentDeviations.Length gameOutcomes.Length
+
+        if opponentRatings.Length = 0 then
+            playerRating, playerDeviation, playerVolatility
+        else
+            let periodVariance = varianceFromGameOutcomes(playerRating, opponentRatings, opponentDeviations)
+            let newVolatilty = volatilityFromMatches(
+                playerRating, playerDeviation, playerVolatility, 
+                periodVariance, opponentRatings, opponentDeviations, gameOutcomes, 
+                convergenceTolerance, systemConstant)
+            
+            let newDeviation = playedPeriodDeviation(playerDeviation, periodVariance, newVolatilty)
+
+            let newRating = playedPeriodRating(playerRating, newDeviation, opponentRatings, opponentDeviations, gameOutcomes)
+
+
+            newRating, newDeviation, newVolatilty
+
+
+
+
+
 
 
 
