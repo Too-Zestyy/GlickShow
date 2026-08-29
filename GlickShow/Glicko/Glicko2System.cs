@@ -56,4 +56,20 @@ public class Glicko2System
 
         return 1 / sum;
     }
+
+    /// <summary>
+    /// Calculates `∆`, which represents the estimated change in rating compared to the pre-period rating. Equivalent to step 4.
+    /// </summary>
+    /// <param name="playerRating">The current rating of the player to estimate change of during this period.</param>
+    /// <param name="opponentRatings">The ratings of all opponents played.</param>
+    /// <param name="opponentDeviations">The deviations of all opponents played.</param>
+    /// <param name="gameOutcomes">The outcomes of all games played.</param>
+    /// <param name="periodVariance"></param>
+    /// <returns></returns>
+    private double calculateEstimatedRatingImprovement(double playerRating, double[] opponentRatings, double[] opponentDeviations, double[] gameOutcomes, double periodVariance)
+    {
+        double sum = 0;
+
+        return sum;
+    }
 }
