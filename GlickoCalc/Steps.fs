@@ -40,7 +40,8 @@ module Steps =
         for i in 0..opponentRatings.Length-1 do
             let matchE = Three_E(playerRating, opponentRatings[i], opponentDeviations[i])
             varianceSum <- varianceSum + Three_g(opponentDeviations[i]) ** 2 * matchE * (1.0 - matchE)
-        varianceSum
+        
+        1.0 / varianceSum
     
     /// <summary>
     /// Calculates <c>∆</c>, which represents the estimated change in rating compared to the pre-period rating. Equivalent to step 4.
@@ -60,17 +61,17 @@ module Steps =
         for i in 0..opponentRatings.Length-1 do
             ratingSum <- ratingSum + Three_g(opponentDeviations[i]) * (gameOutcomes[i] - Three_E(playerRating, opponentRatings[i], opponentDeviations[i]))
 
-        ratingSum
+        periodVariance * ratingSum
 
     let aFromVolatility (volatility: float) = 
         log(volatility ** 2)
 
     let fVolatilityFunction (x: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
-        let a = aFromVolatility(volatility)
-        let ePowX = exp(x)
+        let a = aFromVolatility volatility
+        let ePowX = exp x
         let deviationSquared = deviation ** 2
 
-        ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / (2.0 * (deviationSquared + variance + ePowX ** 2) - (x-a) / systemConstant ** 2)
+        ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / 2.0 * (deviationSquared + variance + ePowX ** 2) - (x-a) / systemConstant ** 2
 
     let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
