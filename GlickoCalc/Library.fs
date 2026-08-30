@@ -73,7 +73,7 @@ module Steps =
         ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / (2.0 * (deviationSquared + variance + ePowX ** 2) - (x-a) / systemConstant ** 2)
 
     let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
-        let a = aFromVolatility(volatility)
+        let a = aFromVolatility volatility
 
         let mutable A = a
         let mutable B = 0.0
@@ -83,7 +83,7 @@ module Steps =
         else 
             let mutable k = 1.0
 
-            while fVolatilityFunction(a-k*systemConstant, systemConstant, volatility, delta, deviation, variance) < 1 do
+            while fVolatilityFunction(a-k*systemConstant, systemConstant, volatility, delta, deviation, variance) < 0 do
                 k <- k + 1.0
 
             B <- a - k*systemConstant
@@ -117,8 +117,8 @@ module Steps =
     let preRatingDeviation (deviation: float, volatility: float) = 
         sqrt(deviation ** 2 + volatility ** 2)
 
-    let playedPeriodDeviation (playerDeviation: float, variance: float, newVolatilty: float) = 
-        1.0 / sqrt(1.0/preRatingDeviation(playerDeviation, newVolatilty)**2 + 1.0/variance)
+    let playedPeriodDeviation (playerDeviation: float, variance: float, newVolatility: float) = 
+        1.0 / sqrt(1.0/preRatingDeviation(playerDeviation, newVolatility)**2 + 1.0/variance)
     
     let playedPeriodRating (playerRating: float, postPeriodDeviation: float, opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[]) = 
         if opponentRatings.Length <> opponentDeviations.Length || opponentRatings.Length <> gameOutcomes.Length || opponentDeviations.Length <> gameOutcomes.Length then
@@ -142,17 +142,17 @@ module Steps =
             playerRating, playerDeviation, playerVolatility
         else
             let periodVariance = varianceFromGameOutcomes(playerRating, opponentRatings, opponentDeviations)
-            let newVolatilty = volatilityFromMatches(
-                playerRating, playerDeviation, playerVolatility, 
-                periodVariance, opponentRatings, opponentDeviations, gameOutcomes, 
+            let newVolatility = volatilityFromMatches(
+                playerRating, playerDeviation, playerVolatility, periodVariance, 
+                opponentRatings, opponentDeviations, gameOutcomes, 
                 convergenceTolerance, systemConstant)
             
-            let newDeviation = playedPeriodDeviation(playerDeviation, periodVariance, newVolatilty)
+            let newDeviation = playedPeriodDeviation(playerDeviation, periodVariance, newVolatility)
 
             let newRating = playedPeriodRating(playerRating, newDeviation, opponentRatings, opponentDeviations, gameOutcomes)
 
 
-            newRating, newDeviation, newVolatilty
+            newRating, newDeviation, newVolatility
 
 
 
