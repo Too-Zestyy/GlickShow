@@ -37,7 +37,7 @@ module Steps =
 
         let mutable varianceSum = 0.0
 
-        for i in 1..opponentRatings.Length-1 do
+        for i in 0..opponentRatings.Length-1 do
             let matchE = Three_E(playerRating, opponentRatings[i], opponentDeviations[i])
             varianceSum <- varianceSum + Three_g(opponentDeviations[i]) ** 2 * matchE * (1.0 - matchE)
         varianceSum
@@ -57,7 +57,7 @@ module Steps =
 
         let mutable ratingSum = 0.0
 
-        for i in 1..opponentRatings.Length-1 do
+        for i in 0..opponentRatings.Length-1 do
             ratingSum <- ratingSum + Three_g(opponentDeviations[i]) * (gameOutcomes[i] - Three_E(playerRating, opponentRatings[i], opponentDeviations[i]))
 
         ratingSum

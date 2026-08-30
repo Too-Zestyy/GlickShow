@@ -17,8 +17,8 @@ let TeestWinningIncreasesRating () =
         p1Rating, p1Deviation, p1Volatility, 
         [|p2Rating|], [|p2Deviation|], [|Constants.Win|], 
         Constants.DefaultSystemConstant, Constants.DefaultConvergenceTolerance)
-    printf"%f\n" p1Volatility
-    printf "%f" newVolatility
+    printf "%f\n" (Convert.ToGlickoOneRating p1Rating)
+    printf "%f" (Convert.ToGlickoOneRating newRating)
 
     // TODO: all new figures output are zero - look into algorithm to fix
 

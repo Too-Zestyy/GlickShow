@@ -7,7 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Constants.fs" />
-    <Compile Include="Library.fs" />
+    <Compile Include="Convert.fs" />
+    <Compile Include="Steps.fs" />
   </ItemGroup>
 
 </Project>
