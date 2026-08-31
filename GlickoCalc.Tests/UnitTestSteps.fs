@@ -43,3 +43,10 @@ let TestTwoEqualPlayersHaveRatingUpdatedAsExpected () =
     Assert.That(System.Math.Round(Convert.ToGlickoOneRating p1NRating, 2), Is.EqualTo 1662.31, "The winning player did not have their rating updated as expected.")
     Assert.That(System.Math.Round(Convert.ToGlickoOneRating p2NRating, 2), Is.EqualTo 1337.69, "The losing player did not have their rating updated as expected.")
 
+    Assert.That(round (Convert.ToGlickoOneDeviation p1NDeviation), Is.EqualTo 290, "The winning player did not have their deviation updated as expected.")
+    Assert.That(round (Convert.ToGlickoOneDeviation p2NDeviation), Is.EqualTo 290, "The losing player did not have their deviation updated as expected.")
+    
+    Assert.That(p1Volatility, Is.EqualTo 0.05999968, "The winning player did not have their volatility updated as expected.")
+    Assert.That(p2Volatility, Is.EqualTo 0.05999968, "The losing player did not have their volatility updated as expected.")
+
+// TODO: Add example from glicko 2 paper
