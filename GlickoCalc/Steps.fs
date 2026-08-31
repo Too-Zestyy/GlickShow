@@ -71,7 +71,7 @@ module Steps =
         let ePowX = exp x
         let deviationSquared = deviation ** 2
 
-        ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / 2.0 * (deviationSquared + variance + ePowX ** 2) - (x-a) / systemConstant ** 2
+        ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / (2.0 * (deviationSquared + variance + ePowX) ** 2) - (x-a) / systemConstant ** 2
 
     let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
@@ -94,10 +94,10 @@ module Steps =
 
         while abs(B-A) > convergenceTolerance do
 
-            let C = A + (A-B)*fA/(fB-fA)
+            let C = A + (A - B) * fA/ (fB - fA)
             let fC = fVolatilityFunction(C, systemConstant, volatility, delta, deviation, variance)
 
-            if fC*fB <= 0 then
+            if fC * fB <= 0 then
                 A <- B
                 fA <- fB
             else
