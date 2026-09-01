@@ -63,9 +63,20 @@ module Steps =
 
         periodVariance * ratingSum
 
+    /// <summary>Calculates <c>a</c>, which is used as a component for updating volatility in multiple places.</summary>
+    /// <param name="volatility">The original volatility which will be updated</param>
+    /// <returns><c>a</c></returns>
     let aFromVolatility (volatility: float) = 
         log(volatility ** 2)
 
+    /// <summary>Calculates <c>f(x)</c> within step 5, which is used during the iterative procedure when updating volatility.</summary>
+    /// <param name="x">The main input for the formula.</param>
+    /// <param name="systemConstant">The current system constant.</param>
+    /// <param name="volatility">The player's original volatility</param>
+    /// <param name="delta">The player's estimated rating improvement (calculated in step 4).</param>
+    /// <param name="deviation">The player's current rating deviation.</param>
+    /// <param name="variance">The player's estimated variance (calculated in step 3).</param>
+    /// <returns></returns>
     let fVolatilityFunction (x: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
         let ePowX = exp x
@@ -73,6 +84,14 @@ module Steps =
 
         ePowX * (delta ** 2 - deviationSquared - variance - ePowX) / (2.0 * (deviationSquared + variance + ePowX) ** 2) - (x-a) / systemConstant ** 2
 
+    /// <summary>Carries out the entire iterative procedure of step 5 to calculate the updated volatility for the period.</summary>
+    /// <param name="convergenceTolerance">The system's margin of error for the newly converged volatility.</param>
+    /// <param name="systemConstant">The system constant to be used across the period.</param>
+    /// <param name="volatility">The player's current volatility.</param>
+    /// <param name="delta">The player's estimated rating improvement (calculated in step 4).</param>
+    /// <param name="deviation">The player's current rating deviation.</param>
+    /// <param name="variance">The player's estimated variance (calculated in step 3).</param>
+    /// <returns></returns>
     let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
 
