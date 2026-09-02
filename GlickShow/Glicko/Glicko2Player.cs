@@ -2,11 +2,10 @@
 
 public class Glicko2Player
 {
-    public const double DefaultRating = 0, DefaultDeviation = 350/173.7178, DefaultVolatility = 0.06;
 
-    double Rating;
-    double Deviation;
-    double Volatility;
+    public double Rating { get; set; }
+    public double Deviation { get; set; }
+    public double Volatility { get; set; }
 
     public Glicko2Player(double rating, double deviation, double volatility)
     {
@@ -17,8 +16,8 @@ public class Glicko2Player
 
     public Glicko2Player()
     {
-        Rating = DefaultRating;
-        Deviation = DefaultDeviation;
-        Volatility = DefaultVolatility;
+        Rating = GlickoCalc.Constants.DefaultPlayerRating;
+        Deviation = GlickoCalc.Constants.DefaultPlayerDeviation;
+        Volatility = GlickoCalc.Constants.DefaultPlayerVolatility;
     }
 }
