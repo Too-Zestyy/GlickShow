@@ -29,7 +29,7 @@ module Steps =
     /// <param name="playerRating">The rating of the player to calculate the variance of based on matches against all opponents.</param>
     /// <param name="opponentRatings">An array of all opponent ratings.</param>
     /// <param name="opponentDeviations">An array of all opponent rating deviations.</param>
-    /// <returns>The deviation of the player when a match has been played once for each opponent rating and deviation.</returns>
+    /// <returns>The variance of the player when a match has been played once for each opponent rating and deviation.</returns>
     /// <exception cref="ArgumentException">If the number of opponent ratings and deviations do not match.</exception>
     let varianceFromGameOutcomes (playerRating: float, opponentRatings: float[], opponentDeviations: float[]) = 
         if opponentRatings.Length <> opponentDeviations.Length then
@@ -72,11 +72,11 @@ module Steps =
     /// <summary>Calculates <c>f(x)</c> within step 5, which is used during the iterative procedure when updating volatility.</summary>
     /// <param name="x">The main input for the formula.</param>
     /// <param name="systemConstant">The current system constant.</param>
-    /// <param name="volatility">The player's original volatility</param>
+    /// <param name="volatility">The player's original performance volatility</param>
     /// <param name="delta">The player's estimated rating improvement (calculated in step 4).</param>
     /// <param name="deviation">The player's current rating deviation.</param>
     /// <param name="variance">The player's estimated variance (calculated in step 3).</param>
-    /// <returns></returns>
+    /// <returns><c>f(x)</c></returns>
     let fVolatilityFunction (x: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
         let ePowX = exp x
@@ -87,11 +87,11 @@ module Steps =
     /// <summary>Carries out the entire iterative procedure of step 5 to calculate the updated volatility for the period.</summary>
     /// <param name="convergenceTolerance">The system's margin of error for the newly converged volatility.</param>
     /// <param name="systemConstant">The system constant to be used across the period.</param>
-    /// <param name="volatility">The player's current volatility.</param>
+    /// <param name="volatility">The player's current performance volatility.</param>
     /// <param name="delta">The player's estimated rating improvement (calculated in step 4).</param>
     /// <param name="deviation">The player's current rating deviation.</param>
     /// <param name="variance">The player's estimated variance (calculated in step 3).</param>
-    /// <returns></returns>
+    /// <returns>The updated volatility figure after the matches within the period have been played.</returns>
     let calculateNewVolatility (convergenceTolerance: float, systemConstant: float, volatility: float, delta: float, deviation: float, variance: float) = 
         let a = aFromVolatility volatility
 
@@ -127,6 +127,17 @@ module Steps =
 
         exp(A / 2.0)
             
+    /// <summary>Combines steps 4 and 5 to directly return updated volatility given the matches within the period.</summary>
+    /// <param name="playerRating">The current rating of the player to estimate change of during this period.</param>
+    /// <param name="playerDeviation">The player's current rating deviation.</param>
+    /// <param name="playerVolatility">The player's current performance volatility.</param>
+    /// <param name="periodVariance">The variance of the player when a match has been played once for each opponent rating and deviation.</param>
+    /// <param name="opponentRatings">The ratings of all opponents played.</param>
+    /// <param name="opponentDeviations">The deviations of all opponents played.</param>
+    /// <param name="gameOutcomes">The outcomes of all games played.</param>
+    /// <param name="convergenceTolerance">The tolerance to accept a value of volatility within.</param>
+    /// <param name="systemConstant">THe system constant to use for calcultions.</param>
+    /// <returns>The new volatility for the player after the matches within the period have been played.</returns>
     let volatilityFromMatches (
         playerRating: float, playerDeviation: float, playerVolatility: float, periodVariance: float, 
         opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[], 
@@ -134,12 +145,30 @@ module Steps =
         let delta = estimateRatingImprovement(playerRating, opponentRatings, opponentDeviations, gameOutcomes, periodVariance)
         calculateNewVolatility(convergenceTolerance, systemConstant, playerVolatility, delta, playerDeviation, periodVariance)
 
-    let preRatingDeviation (deviation: float, volatility: float) = 
+    /// <summary>Calculates the pre-period deviation for a player to be used for calculating the post-period deviation.</summary>
+    /// <remarks>This step is used for all players during a period, regardless of whether they have played a game within it or not. 
+    /// In that case, the player's post-period deviation is the same as the pre-period deviation.</remarks>
+    /// <param name="deviation">The current rating deviation of the player.</param>
+    /// <param name="volatility">The current performance volatility of the player.</param>
+    /// <returns>The pre-period rating deviation of the player (<c>φ∗</c>).</returns>
+    let preRatingPeriodDeviation (deviation: float, volatility: float) = 
         sqrt(deviation ** 2 + volatility ** 2)
 
+    /// <summary>Calculates the post-period deviation for players who have played matches within the period.</summary>
+    /// <param name="playerDeviation">The current rating deviation of the player.</param>
+    /// <param name="variance">The variance obtained from the match results within the period.</param>
+    /// <param name="newVolatility">The updated volatility given the matches within the period.</param>
+    /// <returns>The post-period rating deviation of the player (<c>φ′</c>).</returns>
     let playedPeriodDeviation (playerDeviation: float, variance: float, newVolatility: float) = 
-        1.0 / sqrt(1.0/preRatingDeviation(playerDeviation, newVolatility)**2 + 1.0/variance)
+        1.0 / sqrt(1.0/preRatingPeriodDeviation(playerDeviation, newVolatility)**2 + 1.0/variance)
     
+    /// <summary>Calculates the post-period rating of the player based on the matches played within the period.</summary>
+    /// <param name="playerRating">The current rating of the player to estimate change of during this period.</param>
+    /// <param name="postPeriodDeviation">The new rating deviation of the player after the current period has been taken into account.</param>
+    /// <param name="opponentRatings">The ratings of all opponents played.</param>
+    /// <param name="opponentDeviations">The deviations of all opponents played.</param>
+    /// <param name="gameOutcomes">The outcomes of all games played.</param>
+    /// <returns>The post-period rating of the player after matches have been taken into account (<c>μ′</c>).</returns>
     let playedPeriodRating (playerRating: float, postPeriodDeviation: float, opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[]) = 
         if opponentRatings.Length <> opponentDeviations.Length || opponentRatings.Length <> gameOutcomes.Length || opponentDeviations.Length <> gameOutcomes.Length then
             failwithf "`opponentRatings`, `opponentDeviations` and `gameOutcomes` must be of the same length (got lengths %d, %d and %d)" opponentRatings.Length opponentDeviations.Length gameOutcomes.Length
@@ -159,7 +188,8 @@ module Steps =
             failwithf "`opponentRatings`, `opponentDeviations` and `gameOutcomes` must be of the same length (got lengths %d, %d and %d)" opponentRatings.Length opponentDeviations.Length gameOutcomes.Length
 
         if opponentRatings.Length = 0 then
-            playerRating, playerDeviation, playerVolatility
+            // Step 6 still applies to players who have played no games to decay rating certainty
+            playerRating, preRatingPeriodDeviation(playerDeviation, playerVolatility), playerVolatility
         else
             let periodVariance = varianceFromGameOutcomes(playerRating, opponentRatings, opponentDeviations)
             let newVolatility = volatilityFromMatches(
