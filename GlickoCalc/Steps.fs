@@ -136,7 +136,7 @@ module Steps =
     /// <param name="opponentDeviations">The deviations of all opponents played.</param>
     /// <param name="gameOutcomes">The outcomes of all games played.</param>
     /// <param name="convergenceTolerance">The tolerance to accept a value of volatility within.</param>
-    /// <param name="systemConstant">THe system constant to use for calcultions.</param>
+    /// <param name="systemConstant">The system constant to use for calcultions.</param>
     /// <returns>The new volatility for the player after the matches within the period have been played.</returns>
     let volatilityFromMatches (
         playerRating: float, playerDeviation: float, playerVolatility: float, periodVariance: float, 
@@ -180,6 +180,19 @@ module Steps =
 
         playerRating + postPeriodDeviation ** 2 * deviationSum
 
+    /// <summary>Carries out all necessary updates/calculations necessary for a period given 
+    /// the player's stats, system configuration and matches played.</summary>
+    /// <remarks>Unless there is no other way to carry out a task within a project consuming this library, 
+    /// <strong>this is the only function that should be directly called upon by consumers for purposes of updating player states</strong>.</remarks>
+    /// <param name="playerRating">The current rating of the player to estimate change of during this period.</param>
+    /// <param name="playerDeviation">The player's current rating deviation.</param>
+    /// <param name="playerVolatility">The player's current performance volatility.</param>
+    /// <param name="opponentRatings">The ratings of all opponents played.</param>
+    /// <param name="opponentDeviations">The deviations of all opponents played.</param>
+    /// <param name="gameOutcomes">The outcomes of all games played.</param>
+    /// <param name="systemConstant">The system constant to use for calcultions.</param>
+    /// <param name="convergenceTolerance">The tolerance to accept a value of volatility within.</param>
+    /// <returns>The player's stats after the period (i.e. after the period's matches or lack thereof have been used to update player stats).</returns>
     let UpdatePlayerFromMatches (
         playerRating: float, playerDeviation: float, playerVolatility: float, 
         opponentRatings: float[], opponentDeviations: float[], gameOutcomes: float[],
