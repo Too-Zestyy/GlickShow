@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Constants.fs" />
     <Compile Include="Convert.fs" />
+    <Compile Include="Constants.fs" />
     <Compile Include="Steps.fs" />
   </ItemGroup>
 

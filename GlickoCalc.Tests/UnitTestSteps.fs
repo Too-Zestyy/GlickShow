@@ -77,8 +77,6 @@ let TestTwoInequalPlayersHaveRatingUpdatedAsExpected () =
     )
 
     
-
-// TODO: Add example from glicko 2 paper
 [<Test>]
 let TestImplementationMatchesPaperExampleRatingAndDeviation () = 
     // While some of the figures used in this test case already exist within `Constants`, all numbers have been hardcoded to maintain consistency with the paper if 
@@ -101,4 +99,3 @@ let TestImplementationMatchesPaperExampleRatingAndDeviation () =
         // Assert.That(p1NVolatility, Is.EqualTo 0.0599958431496038, "The player's volatility does not match the paper's calculations")
     )
 
-// TODO: Correct volatility calculations
