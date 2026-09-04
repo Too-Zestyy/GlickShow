@@ -1,8 +1,14 @@
-
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class Glicko2Player
 {
 
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int ID { get; set; }
+
+    
     public double Rating { get; set; }
     public double Deviation { get; set; }
     public double Volatility { get; set; }

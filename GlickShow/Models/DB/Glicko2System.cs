@@ -1,15 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NodaTime;
 
 public class Glicko2System
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ID { get; set; }
-    public required double Constant { get; set; }
+    public double Constant { get; set; }
+    public required Period PeriodDuration { get; set; }
 
-    // public Glicko2System(double constant)
-    // {
-    //     Constant = constant;
-    // }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Instant Epoch { get; set; }
 }

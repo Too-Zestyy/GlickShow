@@ -5,7 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContextPool<GlickoContext>(opt => 
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("GlickoContext")));
+    opt.UseNpgsql(
+        builder.Configuration.GetConnectionString("GlickoContext"),
+        o => o.UseNodaTime()
+        ));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -41,6 +44,7 @@ using (var scope = app.Services.CreateScope())
     try  
     {  
         var dbContext = services.GetRequiredService<GlickoContext>();  
+        
         dbContext.Database.EnsureCreated(); // Creates database/tables if missing  
     }  
     catch (Exception ex)  
