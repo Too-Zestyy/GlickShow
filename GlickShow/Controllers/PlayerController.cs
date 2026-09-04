@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlickShow.Controllers;
 
@@ -31,5 +32,16 @@ public class PlayerController : ControllerBase
             GlickoCalc.Constants.DefaultSystemConstant, GlickoCalc.Constants.DefaultConvergenceTolerance
         );
         return Ok(new Glicko2PlayerPair(new Glicko2Player(p1Nrating, p1Ndeviation, p1NVolatility), new Glicko2Player(p2Nrating, p2Ndeviation, p2NVolatility)));
+    }
+
+    [HttpGet("test-db")]
+    public async Task<ActionResult<Glicko2System>> TestDb(GlickoContext db)
+    {
+        Random rand = new Random();
+        db.Systems.Add(new Glicko2System {Constant = rand.NextDouble()});
+        await db.SaveChangesAsync();
+        var q = await db.Systems.OrderByDescending(s => s.ID).FirstAsync();
+
+        return Ok(q);
     }
 }
