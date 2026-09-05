@@ -21,8 +21,6 @@ let TestWinningIncreasesRating () =
         [|p2Rating|], [|p2Deviation|], [|Constants.Win|], 
         Constants.DefaultSystemConstant, Constants.DefaultConvergenceTolerance)
 
-    // TODO: all new figures output are zero - look into algorithm to fix
-
     Assert.That(newRating, Is.GreaterThan(p1Rating))
 
 [<Test>]

@@ -11,6 +11,9 @@ builder.Services.AddDbContextPool<GlickoContext>(opt =>
         ));
 
 builder.Services.AddControllers();
+
+builder.Services.AddHostedService<PeriodPollerHostedService>();
+builder.Services.AddScoped<IScopedProcessingService, PeriodPollerProcessingService>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi();
 
