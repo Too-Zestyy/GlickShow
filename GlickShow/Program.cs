@@ -4,7 +4,7 @@ using Microsoft.OpenApi;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContextPool<GlickoContext>(opt => 
+builder.Services.AddPooledDbContextFactory<GlickoContext>(opt => 
     opt.UseNpgsql(
         builder.Configuration.GetConnectionString("GlickoContext"),
         o => o.UseNodaTime()
