@@ -136,7 +136,7 @@ module Steps =
     /// <param name="opponentDeviations">The deviations of all opponents played.</param>
     /// <param name="gameOutcomes">The outcomes of all games played.</param>
     /// <param name="convergenceTolerance">The tolerance to accept a value of volatility within.</param>
-    /// <param name="systemConstant">The system constant to use for calcultions.</param>
+    /// <param name="systemConstant">The system constant to use for calculations.</param>
     /// <returns>The new volatility for the player after the matches within the period have been played.</returns>
     let volatilityFromMatches (
         playerRating: float, playerDeviation: float, playerVolatility: float, periodVariance: float, 
@@ -190,7 +190,7 @@ module Steps =
     /// <param name="opponentRatings">The ratings of all opponents played.</param>
     /// <param name="opponentDeviations">The deviations of all opponents played.</param>
     /// <param name="gameOutcomes">The outcomes of all games played.</param>
-    /// <param name="systemConstant">The system constant to use for calcultions.</param>
+    /// <param name="systemConstant">The system constant to use for calculations.</param>
     /// <param name="convergenceTolerance">The tolerance to accept a value of volatility within.</param>
     /// <returns>The player's stats after the period (i.e. after the period's matches or lack thereof have been used to update player stats).</returns>
     let UpdatePlayerFromMatches (
