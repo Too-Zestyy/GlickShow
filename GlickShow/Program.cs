@@ -1,14 +1,18 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPooledDbContextFactory<GlickoContext>(opt => 
+builder.Services.AddPooledDbContextFactory<AppDBContext>(opt => 
     opt.UseNpgsql(
         builder.Configuration.GetConnectionString("GlickoContext"),
         o => o.UseNodaTime()
         ));
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<AppDBContext>();
 
 builder.Services.AddControllers();
 
@@ -46,8 +50,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;  
     try  
     {  
-        var dbContext = services.GetRequiredService<GlickoContext>();  
-        
+        var dbContext = services.GetRequiredService<AppDBContext>();  
         dbContext.Database.EnsureCreated(); // Creates database/tables if missing  
     }  
     catch (Exception ex)  

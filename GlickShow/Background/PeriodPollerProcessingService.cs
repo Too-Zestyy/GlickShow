@@ -24,15 +24,24 @@ internal class PeriodPollerProcessingService : IScopedProcessingService
             executionCount++;
 
             using var scope = _service.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<GlickoContext>();
+            using var context = scope.ServiceProvider.GetRequiredService<AppDBContext>();
 
-            var system = await context.Systems.OrderByDescending(s => s.ID).FirstAsync();
+            try
+            {
+                var system = await context.Systems.OrderByDescending(s => s.ID).FirstAsync();
+                _logger.LogInformation(
+                    "Scoped Processing Service is working. Count: {Count}", executionCount);
+                _logger.LogInformation(
+                    "Scoped processing Service got last system ID: {}", system.ID
+                );
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(
+                "No System data seems to be added. (Error details: {err})", e);
+            }
+            
 
-            _logger.LogInformation(
-                "Scoped Processing Service is working. Count: {Count}", executionCount);
-            _logger.LogInformation(
-                "Scoped processing Service got last system ID: {}", system.ID
-            );
 
             await Task.Delay(10000, stoppingToken);
         }

@@ -36,7 +36,7 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("test-db")]
-    public async Task<ActionResult<Glicko2System>> TestDb(GlickoContext db)
+    public async Task<ActionResult<Glicko2System>> TestDb(AppDBContext db)
     {
         Random rand = new Random();
         db.Systems.Add(new Glicko2System {PeriodDuration = NodaTime.Period.FromDays(7)});
