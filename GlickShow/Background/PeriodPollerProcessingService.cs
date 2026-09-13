@@ -28,11 +28,11 @@ internal class PeriodPollerProcessingService : IScopedProcessingService
 
             try
             {
-                var system = await context.Systems.OrderByDescending(s => s.ID).FirstAsync();
+                var system = await context.Systems.OrderByDescending(s => s.Id).FirstAsync();
                 _logger.LogInformation(
                     "Scoped Processing Service is working. Count: {Count}", executionCount);
                 _logger.LogInformation(
-                    "Scoped processing Service got last system ID: {}", system.ID
+                    "Scoped processing Service got last system ID: {}", system.Id
                 );
             }
             catch (Exception e)

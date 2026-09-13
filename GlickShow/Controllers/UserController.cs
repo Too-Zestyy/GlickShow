@@ -14,7 +14,7 @@ public class UserController : ControllerBase
         Random rand = new Random();
         db.Systems.Add(new Glicko2System {PeriodDuration = NodaTime.Period.FromDays(7)});
         await db.SaveChangesAsync();
-        var q = await db.Systems.OrderByDescending(s => s.ID).FirstAsync();
+        var q = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
 
         return Ok(q);
     }
