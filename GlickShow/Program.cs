@@ -43,6 +43,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapIdentityApi<IdentityUser>();
 
 // Call EnsureCreated() to create the database and tables  
 using (var scope = app.Services.CreateScope())  
