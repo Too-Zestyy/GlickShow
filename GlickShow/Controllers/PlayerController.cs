@@ -1,6 +1,8 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace GlickShow.Controllers;
 
@@ -8,13 +10,49 @@ namespace GlickShow.Controllers;
 [Route("[controller]")]
 public class PlayerController : ControllerBase
 {
-    
+
+    private UserManager<AppUser> _userManager;
+
+    public PlayerController(UserManager<AppUser> userManager)
+    {
+        _userManager = userManager;
+    }
 
     [HttpGet(Name = "Hello")]
     public ActionResult<string> GetHello()
     {
         
         return Ok("Hello From GlickShow!");
+    }
+
+    [HttpPost("new")]
+    [Authorize]
+    public async Task<IActionResult> AddNewPlayerToLatestSystem(AppDBContext db)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized("User ID not found");
+        }
+        var userInDb = await _userManager.GetUserAsync(User);
+        if (userInDb == null)
+        {
+            return Unauthorized("User does not exist");
+        }
+
+        var latestSystem = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
+
+
+        if (await db.Players.Where(p => p.AppUserId == userInDb.Id && p.SystemId == latestSystem.Id).AnyAsync())
+        {
+            return BadRequest("a player already exists for this user and system");
+        }
+
+
+        await db.Players.AddAsync(new Glicko2Player(userInDb.Id, latestSystem.Id));
+        await db.SaveChangesAsync();
+
+        return Ok(userId);
     }
 
     // DB Model requires a linked user, so this testing endpoint is no longer viable without alternate classes for base glicko 2 parameters

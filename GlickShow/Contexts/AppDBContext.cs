@@ -9,6 +9,7 @@ public class AppDBContext : IdentityDbContext<AppUser>
     { }
 
     public DbSet<Glicko2System> Systems { get; set; }
+    public DbSet<Glicko2Player> Players { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

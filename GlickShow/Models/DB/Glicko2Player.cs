@@ -20,15 +20,17 @@ public class Glicko2Player
     public double Volatility { get; set; }
 
 
-    public Glicko2Player(string appUserId)
+    public Glicko2Player(string appUserId, int systemId)
     {
         AppUserId = appUserId;
+        SystemId = systemId;
         Rating = GlickoCalc.Constants.DefaultPlayerRating;
         Deviation = GlickoCalc.Constants.DefaultPlayerDeviation;
         Volatility = GlickoCalc.Constants.DefaultPlayerVolatility;
     }
 
-    public Glicko2Player(string appUserId, double rating, double deviation, double volatility) : this(appUserId)
+    public Glicko2Player(string appUserId, int systemId, double rating, double deviation, double volatility) 
+    : this(appUserId, systemId)
     {
         Rating = rating;
         Deviation = deviation;

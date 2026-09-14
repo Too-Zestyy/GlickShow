@@ -11,7 +11,7 @@ builder.Services.AddPooledDbContextFactory<AppDBContext>(opt =>
         o => o.UseNodaTime()
         ));
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddEntityFrameworkStores<AppDBContext>();
 
 builder.Services.AddControllers();
@@ -43,7 +43,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapIdentityApi<IdentityUser>();
+app.MapIdentityApi<AppUser>();
 
 // Call EnsureCreated() to create the database and tables  
 using (var scope = app.Services.CreateScope())  
