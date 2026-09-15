@@ -103,7 +103,7 @@ public class PlayerController : ControllerBase
                     && p.SystemId == parameters.SystemId
                 )
                 .SingleAsync();
-            return Ok(new RedactedGlicko2Player(player, glickoVersion));
+            return Ok(new RedactedGlickoPlayer(player, glickoVersion));
         }
         // TODO: Log error to file
         catch (Exception e)

@@ -1,8 +1,9 @@
 /// <summary>
-/// Removes the references to the internal user and system elements
-/// for response payloads from a player entity for both brevity and security purposes.
+/// Controls redaction and management of player data sent to clients after being collected from the DB.
+/// In addition to removing fields containing potentially sensitive data,
+/// the version of glicko scale is specified for the constructor to match when returned.
 /// </summary>
-public class RedactedGlicko2Player
+public class RedactedGlickoPlayer
 {
     public int Id { get; set; }
     public string UserId { get; set; }
@@ -13,7 +14,7 @@ public class RedactedGlicko2Player
     public double Deviation { get; set; }
     public double Volatility { get; set; }
 
-    public RedactedGlicko2Player(
+    public RedactedGlickoPlayer(
         Glicko2Player player,
         GlickoVersion glickoVersion
     )
