@@ -8,7 +8,7 @@ public class Glicko2System
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public double Constant { get; set; }
-    public required Period PeriodDuration { get; set; }
+    public required Duration PeriodDuration { get; set; }
 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Instant Epoch { get; set; }

@@ -8,6 +8,7 @@ namespace GlickShow.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class PlayerController : ControllerBase
 {
     private UserManager<AppUser> _userManager;
@@ -27,7 +28,7 @@ public class PlayerController : ControllerBase
     [Authorize]
     public async Task<IActionResult> AddNewPlayerToSystem(
         AppDBContext db,
-        [FromBody] AddPlayerToSystemParameters parameters
+        [FromBody] AddPlayerToSystemParams parameters
     )
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -87,17 +88,4 @@ public class PlayerController : ControllerBase
     //     );
     //     return Ok(new Glicko2PlayerPair(new Glicko2Player(p1Nrating, p1Ndeviation, p1NVolatility), new Glicko2Player(p2Nrating, p2Ndeviation, p2NVolatility)));
     // }
-
-    [HttpGet("test-db")]
-    public async Task<ActionResult<Glicko2System>> TestDb(AppDBContext db)
-    {
-        Random rand = new Random();
-        db.Systems.Add(
-            new Glicko2System { PeriodDuration = NodaTime.Period.FromDays(7) }
-        );
-        await db.SaveChangesAsync();
-        var q = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
-
-        return Ok(q);
-    }
 }
