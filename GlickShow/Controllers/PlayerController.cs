@@ -18,12 +18,6 @@ public class PlayerController : ControllerBase
         _userManager = userManager;
     }
 
-    [HttpGet(Name = "Hello")]
-    public ActionResult<string> GetHello()
-    {
-        return Ok("Hello From GlickShow!");
-    }
-
     [HttpPost("new")]
     [Authorize]
     public async Task<IActionResult> AddNewPlayerToSystem(
@@ -68,6 +62,53 @@ public class PlayerController : ControllerBase
         );
         await db.SaveChangesAsync();
         return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetPlayerForSystem(
+        AppDBContext db,
+        [FromBody] GetSystemPlayerParams parameters
+    )
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        var userInDb = await _userManager.GetUserAsync(User);
+        if (userInDb == null)
+        {
+            return Unauthorized();
+        }
+
+        if (
+            !await db
+                .Players.Where(p =>
+                    p.AppUserId == userInDb.Id
+                    && p.SystemId == parameters.SystemId
+                )
+                .AnyAsync()
+        )
+        {
+            return ValidationProblem(
+                "no player exists for the specified system"
+            );
+        }
+
+        try
+        {
+            var player = await db
+                .Players.Where(p =>
+                    p.AppUserId == userInDb.Id
+                    && p.SystemId == parameters.SystemId
+                )
+                .SingleAsync();
+            return Ok(new RedactedGlicko2Player(player));
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500);
+        }
     }
 
     // DB Model requires a linked user, so this testing endpoint is no longer viable without alternate classes for base glicko 2 parameters
