@@ -21,7 +21,6 @@ public class PlayerController : ControllerBase
     [HttpGet(Name = "Hello")]
     public ActionResult<string> GetHello()
     {
-        
         return Ok("Hello From GlickShow!");
     }
 
@@ -32,29 +31,29 @@ public class PlayerController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userId == null)
         {
-            return Unauthorized("User ID not found");
+            return Unauthorized();
         }
         var userInDb = await _userManager.GetUserAsync(User);
         if (userInDb == null)
         {
-            return Unauthorized("User does not exist");
+            return Unauthorized();
         }
 
         
         if (!await db.Systems.Where(s => s.Id == parameters.SystemId).AnyAsync())
         {
-            return BadRequest("no system exists with requested id");
+            return ValidationProblem("no system exists with requested id");
         }
+
 
         if (await db.Players.Where(p => p.AppUserId == userInDb.Id && p.SystemId == parameters.SystemId).AnyAsync())
         {
-            return BadRequest("a player already exists for this user and system");
+            return ValidationProblem("a player already exists for this user and system");
         }
 
 
         await db.Players.AddAsync(new Glicko2Player(userInDb.Id, parameters.SystemId));
         await db.SaveChangesAsync();
-
         return Ok();
     }
 
