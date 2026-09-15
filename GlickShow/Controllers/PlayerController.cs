@@ -27,7 +27,7 @@ public class PlayerController : ControllerBase
 
     [HttpPost("new")]
     [Authorize]
-    public async Task<IActionResult> AddNewPlayerToLatestSystem(AppDBContext db)
+    public async Task<IActionResult> AddNewPlayerToSystem(AppDBContext db, [FromBody] AddPlayerToSystemParameters parameters)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userId == null)
@@ -40,19 +40,22 @@ public class PlayerController : ControllerBase
             return Unauthorized("User does not exist");
         }
 
-        var latestSystem = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
+        
+        if (!await db.Systems.Where(s => s.Id == parameters.SystemId).AnyAsync())
+        {
+            return BadRequest("no system exists with requested id");
+        }
 
-
-        if (await db.Players.Where(p => p.AppUserId == userInDb.Id && p.SystemId == latestSystem.Id).AnyAsync())
+        if (await db.Players.Where(p => p.AppUserId == userInDb.Id && p.SystemId == parameters.SystemId).AnyAsync())
         {
             return BadRequest("a player already exists for this user and system");
         }
 
 
-        await db.Players.AddAsync(new Glicko2Player(userInDb.Id, latestSystem.Id));
+        await db.Players.AddAsync(new Glicko2Player(userInDb.Id, parameters.SystemId));
         await db.SaveChangesAsync();
 
-        return Ok(userId);
+        return Ok();
     }
 
     // DB Model requires a linked user, so this testing endpoint is no longer viable without alternate classes for base glicko 2 parameters
