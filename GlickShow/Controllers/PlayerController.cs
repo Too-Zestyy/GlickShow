@@ -19,7 +19,6 @@ public class PlayerController : ControllerBase
     }
 
     [HttpPost("new")]
-    [Authorize]
     public async Task<IActionResult> AddNewPlayerToSystem(
         AppDBContext db,
         [FromBody] AddPlayerToSystemParams parameters
@@ -67,7 +66,8 @@ public class PlayerController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetPlayerForSystem(
         AppDBContext db,
-        [FromBody] GetSystemPlayerParams parameters
+        [FromBody] GetSystemPlayerParams parameters,
+        [FromQuery] GlickoVersion glickoVersion = GlickoVersion.Two
     )
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -103,8 +103,9 @@ public class PlayerController : ControllerBase
                     && p.SystemId == parameters.SystemId
                 )
                 .SingleAsync();
-            return Ok(new RedactedGlicko2Player(player));
+            return Ok(new RedactedGlicko2Player(player, glickoVersion));
         }
+        // TODO: Log error to file
         catch (Exception e)
         {
             return StatusCode(500);
