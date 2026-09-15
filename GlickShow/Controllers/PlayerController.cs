@@ -10,7 +10,6 @@ namespace GlickShow.Controllers;
 [Route("[controller]")]
 public class PlayerController : ControllerBase
 {
-
     private UserManager<AppUser> _userManager;
 
     public PlayerController(UserManager<AppUser> userManager)
@@ -26,7 +25,10 @@ public class PlayerController : ControllerBase
 
     [HttpPost("new")]
     [Authorize]
-    public async Task<IActionResult> AddNewPlayerToSystem(AppDBContext db, [FromBody] AddPlayerToSystemParameters parameters)
+    public async Task<IActionResult> AddNewPlayerToSystem(
+        AppDBContext db,
+        [FromBody] AddPlayerToSystemParameters parameters
+    )
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userId == null)
@@ -39,20 +41,30 @@ public class PlayerController : ControllerBase
             return Unauthorized();
         }
 
-        
-        if (!await db.Systems.Where(s => s.Id == parameters.SystemId).AnyAsync())
+        if (
+            !await db.Systems.Where(s => s.Id == parameters.SystemId).AnyAsync()
+        )
         {
             return ValidationProblem("no system exists with requested id");
         }
 
-
-        if (await db.Players.Where(p => p.AppUserId == userInDb.Id && p.SystemId == parameters.SystemId).AnyAsync())
+        if (
+            await db
+                .Players.Where(p =>
+                    p.AppUserId == userInDb.Id
+                    && p.SystemId == parameters.SystemId
+                )
+                .AnyAsync()
+        )
         {
-            return ValidationProblem("a player already exists for this user and system");
+            return ValidationProblem(
+                "a player already exists for this user and system"
+            );
         }
 
-
-        await db.Players.AddAsync(new Glicko2Player(userInDb.Id, parameters.SystemId));
+        await db.Players.AddAsync(
+            new Glicko2Player(userInDb.Id, parameters.SystemId)
+        );
         await db.SaveChangesAsync();
         return Ok();
     }
@@ -80,7 +92,9 @@ public class PlayerController : ControllerBase
     public async Task<ActionResult<Glicko2System>> TestDb(AppDBContext db)
     {
         Random rand = new Random();
-        db.Systems.Add(new Glicko2System {PeriodDuration = NodaTime.Period.FromDays(7)});
+        db.Systems.Add(
+            new Glicko2System { PeriodDuration = NodaTime.Period.FromDays(7) }
+        );
         await db.SaveChangesAsync();
         var q = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
 

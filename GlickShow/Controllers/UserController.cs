@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 
 namespace GlickShow.Controllers;
 
@@ -12,7 +11,9 @@ public class UserController : ControllerBase
     public async Task<ActionResult<Glicko2System>> TestDb(AppDBContext db)
     {
         Random rand = new Random();
-        db.Systems.Add(new Glicko2System {PeriodDuration = NodaTime.Period.FromDays(7)});
+        db.Systems.Add(
+            new Glicko2System { PeriodDuration = NodaTime.Period.FromDays(7) }
+        );
         await db.SaveChangesAsync();
         var q = await db.Systems.OrderByDescending(s => s.Id).FirstAsync();
 

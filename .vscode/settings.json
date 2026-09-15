@@ -8,5 +8,10 @@
     "cSpell.words": [
         "Glick",
         "Glicko"
-    ]
+    ],
+    "[csharp]": {
+        "editor.defaultFormatter": "csharpier.csharpier-vscode",
+        "editor.formatOnSave": true
+    },
+    "editor.rulers": [80]
 }

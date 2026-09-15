@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public class Glicko2Player
 {
-
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -14,11 +13,9 @@ public class Glicko2Player
     public string AppUserId { get; set; }
     public AppUser AppUser { get; } = null!;
 
-    
     public double Rating { get; set; }
     public double Deviation { get; set; }
     public double Volatility { get; set; }
-
 
     public Glicko2Player(string appUserId, int systemId)
     {
@@ -29,12 +26,17 @@ public class Glicko2Player
         Volatility = GlickoCalc.Constants.DefaultPlayerVolatility;
     }
 
-    public Glicko2Player(string appUserId, int systemId, double rating, double deviation, double volatility) 
-    : this(appUserId, systemId)
+    public Glicko2Player(
+        string appUserId,
+        int systemId,
+        double rating,
+        double deviation,
+        double volatility
+    )
+        : this(appUserId, systemId)
     {
         Rating = rating;
         Deviation = deviation;
         Volatility = volatility;
     }
-
 }

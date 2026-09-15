@@ -2,8 +2,10 @@ public class PeriodPollerHostedService : BackgroundService
 {
     private readonly ILogger<PeriodPollerHostedService> _logger;
 
-    public PeriodPollerHostedService(IServiceProvider services, 
-        ILogger<PeriodPollerHostedService> logger)
+    public PeriodPollerHostedService(
+        IServiceProvider services,
+        ILogger<PeriodPollerHostedService> logger
+    )
     {
         Services = services;
         _logger = logger;
@@ -14,7 +16,8 @@ public class PeriodPollerHostedService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "Consume Scoped Service Hosted Service running.");
+            "Consume Scoped Service Hosted Service running."
+        );
 
         await DoWork(stoppingToken);
     }
@@ -22,13 +25,13 @@ public class PeriodPollerHostedService : BackgroundService
     private async Task DoWork(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "Consume Scoped Service Hosted Service is working.");
+            "Consume Scoped Service Hosted Service is working."
+        );
 
         using (var scope = Services.CreateScope())
         {
-            var scopedProcessingService = 
-                scope.ServiceProvider
-                    .GetRequiredService<IScopedProcessingService>();
+            var scopedProcessingService =
+                scope.ServiceProvider.GetRequiredService<IScopedProcessingService>();
 
             await scopedProcessingService.DoWork(stoppingToken);
         }
@@ -37,7 +40,8 @@ public class PeriodPollerHostedService : BackgroundService
     public override async Task StopAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation(
-            "Consume Scoped Service Hosted Service is stopping.");
+            "Consume Scoped Service Hosted Service is stopping."
+        );
 
         await base.StopAsync(stoppingToken);
     }

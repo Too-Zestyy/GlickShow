@@ -5,25 +5,34 @@ using Microsoft.OpenApi;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPooledDbContextFactory<AppDBContext>(opt => 
+builder.Services.AddPooledDbContextFactory<AppDBContext>(opt =>
     opt.UseNpgsql(
         builder.Configuration.GetConnectionString("GlickoContext"),
         o => o.UseNodaTime()
-        ));
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>()
-    .AddEntityFrameworkStores<AppDBContext>();
+    )
+);
 
+builder.Services.AddAuthorization();
+builder
+    .Services.AddIdentityApiEndpoints<AppUser>()
+    .AddEntityFrameworkStores<AppDBContext>();
 builder.Services.AddControllers();
 
 builder.Services.AddHostedService<PeriodPollerHostedService>();
-builder.Services.AddScoped<IScopedProcessingService, PeriodPollerProcessingService>();
+builder.Services.AddScoped<
+    IScopedProcessingService,
+    PeriodPollerProcessingService
+>();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "GlickShow", Version = "v1" });
+    options.SwaggerDoc(
+        "v1",
+        new OpenApiInfo { Title = "GlickShow", Version = "v1" }
+    );
 });
 
 var app = builder.Build();
@@ -45,20 +54,20 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapIdentityApi<AppUser>();
 
-// Call EnsureCreated() to create the database and tables  
-using (var scope = app.Services.CreateScope())  
-{  
-    var services = scope.ServiceProvider;  
-    try  
-    {  
-        var dbContext = services.GetRequiredService<AppDBContext>();  
-        dbContext.Database.EnsureCreated(); // Creates database/tables if missing  
-    }  
-    catch (Exception ex)  
-    {  
-        var logger = services.GetRequiredService<ILogger<Program>>();  
-        logger.LogError(ex, "An error occurred creating the database.");  
-    }  
-}  
+// Call EnsureCreated() to create the database and tables
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var dbContext = services.GetRequiredService<AppDBContext>();
+        dbContext.Database.EnsureCreated(); // Creates database/tables if missing
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the database.");
+    }
+}
 
 app.Run();
