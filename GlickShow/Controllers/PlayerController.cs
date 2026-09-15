@@ -19,7 +19,7 @@ public class PlayerController : ControllerBase
     }
 
     [HttpPost("new")]
-    public async Task<IActionResult> AddNewPlayerToSystem(
+    public async Task<ActionResult<NewPlayerConfirmation>> AddNewPlayerToSystem(
         AppDBContext db,
         [FromBody] AddPlayerToSystemParams parameters
     )
@@ -56,15 +56,15 @@ public class PlayerController : ControllerBase
             );
         }
 
-        await db.Players.AddAsync(
-            new Glicko2Player(userInDb.Id, parameters.SystemId)
-        );
+        var newPlayer = new Glicko2Player(userInDb.Id, parameters.SystemId);
+
+        await db.Players.AddAsync(newPlayer);
         await db.SaveChangesAsync();
-        return Ok();
+        return Ok(new NewPlayerConfirmation { Id = newPlayer.Id });
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPlayerForSystem(
+    public async Task<ActionResult<RedactedGlickoPlayer>> GetPlayerForSystem(
         AppDBContext db,
         [FromBody] GetSystemPlayerParams parameters,
         [FromQuery] GlickoVersion glickoVersion = GlickoVersion.Two
